@@ -5,18 +5,22 @@ function Base.zeros(::Type{RGB}, n::Int, m::Int)
 end
 
 mutable struct Film <: AbstractFilm
-    w::Int
-    h::Int
+    nx::Int # number of pixels 
+    ny::Int # number of pixels
     img::Matrix{RGB}
-    function Film(w::Int,h::Int)
-        img = zeros(RGB, w, h)
-        new(w,h,img)
+    function Film(width::Int,height::Int, nx::Int, ny::Int)
+        img = zeros(RGB, nx, ny)
+        new(width,height, nx, ny, img)
     end
 end
 
 function _set_pixel(f::AbstractFilm, i::Int, j::Int, c::RGB)
     f.img[i,j] = c
     return
+end
+
+function _get_sample(f::AbstractFilm, i::Int, j::Int)
+    return (i+0.5)/f.nx, (j+0.5)/f.ny
 end
 
 function _save(f::AbstractFilm, filename::String = "img.png")

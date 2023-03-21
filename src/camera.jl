@@ -1,20 +1,36 @@
 abstract type AbstractCamera end
 
-Base.@kwdef mutable struct Camera <: AbstractCamera
-    eye::Vector{Float64} = [0.0,0.0,0.0]
-    center::Vector{Float64} = [0.0,0.0,0.0]
-    up::Vector{Float64} = [0.0,0.0,1.0]
+mutable struct Camera <: AbstractCamera
+    eye::Vector{Float64}
+    center::Vector{Float64}
+    up::Vector{Float64}
 
-    d::Float64 = 10.0
-    θ::Float64 = 60.0
-    w::Float64 = 10.0
-    h::Float64 = 10.0
+    u::Vector{Float64}
+    v::Vector{Float64}
+    w::Vector{Float64}
+
+    d::Float64
+    θ::Float64
+    width::Float64
+    height::Float64
+
+    function Camera(
+            eye::Vector{Float64}, 
+            center::Vector{Float64}, 
+            up::Vector{Float64}, 
+            d::Float64, 
+            θ::Float64, 
+            width::Float64, 
+            height::Float64
+        )
+        w = normalize(eye - center)
+        u = normalize(cross(up,w))
+        v = cross(w,u)
+        new(eye, center, up, u, v, w, d, θ, width, height)
+    end 
 end
 
-function _ratio(c::AbstractCamera)
-    return c.w/c.h
+function _to_global_coord(c::AbstractCamera)
+    return [c.u c.v c.w] * c
 end
 
-function _get_sample(c::AbstractCamera, i::Int, j::Int)
-    return (i+0.5)/c.w , (j+0.5)/Camera.h 
-end
