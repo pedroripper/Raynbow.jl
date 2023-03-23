@@ -2,7 +2,7 @@ abstract type AbstractCamera end
 
 mutable struct Camera <: AbstractCamera
     eye::Vector{Float64}
-    center::Vector{Float64}
+    c::Vector{Float64}
     up::Vector{Float64}
 
     u::Vector{Float64}
@@ -16,17 +16,15 @@ mutable struct Camera <: AbstractCamera
 
     function Camera(
             eye::Vector{Float64}, 
-            center::Vector{Float64}, 
+            c::Vector{Float64}, 
             up::Vector{Float64}, 
             d::Float64, 
             θ::Float64, 
-            width::Float64, 
-            height::Float64
         )
-        w = normalize(eye - center)
+        w = normalize(eye - c)
         u = normalize(cross(up,w))
         v = cross(w,u)
-        new(eye, center, up, u, v, w, d, θ, width, height)
+        new(eye, c, up, u, v, w, d, θ)
     end 
 end
 

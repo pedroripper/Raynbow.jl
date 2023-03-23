@@ -4,7 +4,7 @@ function _generate_ray(c::AbstractCamera, f::AbstractFilm, i::Int, j::Int)
     
     # ray 
     o = c.eye
-    d = - c.f * c.w + u * c.u + v * c.v
+    d = - c.d * c.w + u_pix'c.u + v_pix'c.v
 
     return Ray(o, d)
 end
@@ -14,20 +14,25 @@ function _intersect(r::Ray, scene::Scene)
     t = 0.0
     p = _evaluate(r,t)
     while _inScene(p)
-        p = _evaluate(r, t)
         for shape in scene.shapes 
-            h = _get_hit(shape, r, p, t)
+            h = _get_hit(shape, p, r.origin, t)
             if !isnothing(h)
                 push!(hits, h)
             end
         end
         t += 0.01
+        p = _evaluate(r, t)
     end
     return hits
 end
 
 function _phong(scene::Scene, hit::Hit, ray::Ray)
-    
+    c = [0.0, 0.0, 0.0]
+    v̂ = normalize(ray.origin - hit.position)
+    for light in scene.lights
+        Lᵢ, Î = _radiance(light, hit)
+        # c += hit.material.difuse * 
+    end
 end
 
 
