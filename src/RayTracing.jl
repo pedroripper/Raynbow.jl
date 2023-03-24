@@ -1,14 +1,3 @@
-function _generate_ray(c::AbstractCamera, f::AbstractFilm, i::Int, j::Int)
-    # pixel position on the plane
-    u_pix, v_pix = _get_sample(f, i, j)
-    
-    # ray 
-    o = c.eye
-    d = - c.d * c.w + u_pix'c.u + v_pix'c.v
-
-    return Ray(o, d)
-end
-
 function _intersect(r::Ray, scene::Scene)
     hits = Vector{Hit}()
     t = 0.0
@@ -35,12 +24,15 @@ function _phong(scene::Scene, hit::Hit, ray::Ray)
     end
 end
 
+function _trace_ray(scene::Scene, Ray)
+    
+end
 
-function raytrace(scene::Scene)
-    film = scene.film
+function render_raytrace(film::Film, camera::Camera, scene::Scene)
 
-    for i in 1:film.nx, j in 1:film.ny
-        ray = _generate_ray(scene.camera, scene.film, i, j)
+    for i in 1:film.n_pixels_x, j in 1:film.n_pixels_y
+        x,y = _get_sample(film, i, j)
+        ray = _generate_ray(camera, scene.film, x, y)
         hits = _intersect(ray, scene)
         if isempty(hits)
             _set_pixel(film, i, j, RGB(0,0,0))

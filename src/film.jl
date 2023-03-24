@@ -6,16 +6,16 @@ end
 
 mutable struct Film <: AbstractFilm
     width::Int
-    heigh::Int
-    nx::Int # number of pixels 
-    ny::Int # number of pixels
+    height::Int
+    n_pixels_x::Int # number of pixels 
+    n_pixels_y::Int # number of pixels
     img::Matrix{RGB}
     l::Vector{Float64}
     r::Vector{Float64}
     b::Vector{Float64}
-    function Film(width::Int,height::Int, nx::Int, ny::Int, l::Vector{Float64}, r::Vector{Float64}, b::Vector{Float64})
-        img = zeros(RGB, nx, ny)
-        new(width,height, nx, ny, img, l, r, b)
+    function Film(width::Int,height::Int, n_pixels_x::Int, n_pixels_y::Int, l::Vector{Float64}, r::Vector{Float64}, b::Vector{Float64})
+        img = zeros(RGB, n_pixels_x, n_pixels_y)
+        new(width,height, n_pixels_x, n_pixels_y, img, l, r, b)
     end
 end
 
@@ -25,7 +25,7 @@ function _set_pixel(f::AbstractFilm, i::Int, j::Int, c::RGB)
 end
 
 function _get_sample(f::AbstractFilm, i::Int, j::Int)
-    return f.l + (f.r-f.l)*(i+0.5)/f.nx, f.b + (f.r-f.b)*(j+0.5)/f.ny
+    return (i+0.5)/f.width, (j+0.5)/f.height
 end
 
 function _save(f::AbstractFilm, filename::String = "img.png")
