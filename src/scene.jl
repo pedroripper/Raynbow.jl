@@ -1,4 +1,4 @@
-mutable struct Scene
+mutable struct Scene <: AbstractScene
     camera::Camera
     film::Film
     shapes::Vector{Sphere}
@@ -14,4 +14,3 @@ mutable struct Scene
             new(c,f,s,l,pos)
     end
 end
-

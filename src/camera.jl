@@ -1,5 +1,3 @@
-abstract type AbstractCamera end
-
 mutable struct Camera <: AbstractCamera
     eye::Vector{Float64}
     c::Vector{Float64}
@@ -11,20 +9,19 @@ mutable struct Camera <: AbstractCamera
 
     d::Float64
     θ::Float64
-    width::Float64
-    height::Float64
 
     view_matrix::Matrix{Float64}
     view_matrix_inv::Matrix{Float64}
+
+    film::Film
 
     function Camera(
             eye::Vector{Float64}, 
             c::Vector{Float64}, 
             up::Vector{Float64}, 
+            film::Film,
             d::Float64, 
-            θ::Float64 = 60.0, 
-            width::Int = 100,
-            height::Int = 100
+            θ::Float64 = 60.0,
         )
         w = normalize(eye - c)
         u = normalize(cross(up,w))
@@ -40,16 +37,16 @@ mutable struct Camera <: AbstractCamera
         T = [[1,0,0,0] [0,1,0,0] [0,0,1,0] [-eye[1],-eye[2],-eye[3],1]]
 
         V = B'T
-        @show typeof(V)
+
         V_inv = V^-1
-        @show typeof(V_inv)
-        new(eye, c, up, u, v, w, d, θ, width, height, V, V_inv)
+
+        new(eye, c, up, u, v, w, d, θ, V, V_inv, film)
     end 
 end
 
 function _generate_ray(c::AbstractCamera, nx::Float64, ny::Float64)
     Δv = c.d * tan(c.θ/2) 
-    Δu = Δv * (c.width/c.height)
+    Δu = Δv * (c.film.width/c.film.height)
     p = [-Δu + 2 * Δu * nx, -Δv + 2*Δv*ny, -c.d, 1]
     o = _to_global_coord(c, [0.0,0.0,0.0,1.0])
     t = _to_global_coord(c, p)
