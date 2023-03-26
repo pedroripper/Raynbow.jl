@@ -1,10 +1,14 @@
 function test_hit()
     s = Raynbow.Sphere([20.0,0.0,0.0], 10.0, Raynbow.Plastic())
-    p1 = [10.0,0.0,0.0]
+    l = Raynbow.PointLight([20.0,0.0,50.0],255.0)
+
+    scene = Raynbow.Scene([s],[l])
+
+    p1 = [5.0,0.0,0.0]
     p2 = [20.0,0.0,10.0]
     p3 = [20.0,15.0,0.0]
     p4 = [20.0,-10.0,0.0]
-    origin = [-30,0.0,40.0]
+    origin = [0.0,0.0,0.0]
 
     h1 = Raynbow._get_hit(s, p1, origin, 1.0)
     h2 = Raynbow._get_hit(s, p2, origin, 1.0)

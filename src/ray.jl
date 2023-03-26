@@ -11,3 +11,4 @@ end
 function _evaluate(r::Ray, t::Float64)
     return r.origin + t*r.direction
 end
+

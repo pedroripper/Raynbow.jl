@@ -7,5 +7,5 @@ mutable struct Hit <: AbstractHit
 end
 
 function _islight(hit::Hit)
-    return typeof(hit.element) == Light
+    return typeof(hit.element) == AbstractLight
 end

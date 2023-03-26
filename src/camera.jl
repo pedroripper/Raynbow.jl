@@ -21,7 +21,7 @@ mutable struct Camera <: AbstractCamera
             up::Vector{Float64}, 
             film::Film,
             d::Float64, 
-            θ::Float64 = 60.0,
+            θ::Float64 = 20.0,
         )
         w = normalize(eye - c)
         u = normalize(cross(up,w))
@@ -47,13 +47,21 @@ end
 function _generate_ray(c::AbstractCamera, nx::Float64, ny::Float64)
     Δv = c.d * tan(c.θ/2) 
     Δu = Δv * (c.film.width/c.film.height)
-    p = [-Δu + 2 * Δu * nx, -Δv + 2*Δv*ny, -c.d, 1]
-    o = _to_global_coord(c, [0.0,0.0,0.0,1.0])
+    p = [-Δu + 2 * Δu * nx, -Δv + 2*Δv*ny, -c.d, 1.0]
+    o = _to_global_coord(c, append!(deepcopy(c.eye),1))
+    # @show o
     t = _to_global_coord(c, p)
+    # @show t
+    
     return Ray(o[1:3], normalize(t - o)[1:3])
 end
 
 function _to_global_coord(c::AbstractCamera, pos::Vector{Float64})
     return c.view_matrix_inv * pos
 end
+
+function _to_camera_coord(c::AbstractCamera, pos::Vector{Float64})
+    return c.view_matrix * pos
+end
+
 

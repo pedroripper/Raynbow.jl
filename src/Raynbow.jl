@@ -1,6 +1,7 @@
 module Raynbow
 
 using Images
+using ImageMagick
 using LinearAlgebra
 
 abstract type Material end

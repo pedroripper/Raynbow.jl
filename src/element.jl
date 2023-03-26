@@ -1,7 +1,7 @@
 struct Plastic <: Material 
-    difuse::RGB
-    specular::RGB
-    function Plastic(difuse::RGB = RGB(255.0,0.0,0.0), specular::RGB = RGB(255.0))
+    difuse::RGB{Float64}
+    specular::RGB{Float64}
+    function Plastic(difuse::RGB{Float64} = RGB{Float64}(255.0,0.0,0.0), specular::RGB{Float64} = RGB{Float64}(255.0))
         new(difuse, specular)
     end
 end
@@ -25,7 +25,7 @@ end
 
 
 function _get_hit(s::Sphere, p::Vector{Float64}, o::Vector{Float64}, t::Float64)
-    if (p - s.center)' * (p - s.center) - s.radius^2 == 0
+    if isapprox((p - s.center)' * (p - s.center) - s.radius^2, 0.0; atol = 0.1)
         normal = (p - s.center)/s.radius
         backfacing = norm(s.center - o) < norm(p - o)
         return Hit(t, p, normal, backfacing, s)
@@ -35,20 +35,42 @@ function _get_hit(s::Sphere, p::Vector{Float64}, o::Vector{Float64}, t::Float64)
 end
 
 function _radiance(light::PointLight, hit::AbstractHit)
-    Î = normalize(light.position - hit.position)
-    r = norm(light.position - hit.position)
+    l̂ = normalize(light.center - hit.position)
+    r = norm(light.center - hit.position)
+
     Lᵢ = light.power/(r^2)
+    @show Lᵢ
     return Lᵢ, l̂
 end
 
 function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHit, origin::Vector{Float64})
-    color = RGB(0.0)
+    println("Getting color")
+    color = RGB{Float64}(0.0)
     v̂ = normalize(origin - hit.position)
     n̂ = normalize(hit.position)
     for light in scene.lights
-        Lᵢ, l̂ = _radiance(light, hit.position)
+        Lᵢ, l̂ = _radiance(light, hit)
+
         color += shape.material.difuse * Lᵢ * n̂'l̂
+        if color[1] < 0.0 || color[2] < 0.0 || color[3] < 0.0
+            # @show  l̂
+            # @show n̂'l̂
+            # @show Lᵢ
+            # @show color
+            # error()
+            color = RGB{Float64}(abs(color[1]), abs(color[2]), abs(color[3]) )
+        end
+        if color[1] > 255.0 || color[2] > 255.0 || color[3] > 255.0
+            # @show  l̂
+            # @show n̂'l̂
+            # @show Lᵢ
+            # @show color
+            # error()
+            # color = RGB{Float64}(abs(color[1]), abs(color[2]), abs(color[3]) )
+        end
         # specular missing
     end
+    @show color
+    # sleep(1.0)
     return color
 end
