@@ -63,5 +63,3 @@ end
 function _to_camera_coord(c::AbstractCamera, pos::Vector{Float64})
     return c.view_matrix * pos
 end
-
-

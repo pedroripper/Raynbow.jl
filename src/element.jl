@@ -25,7 +25,7 @@ end
 
 
 function _get_hit(s::Sphere, p::Vector{Float64}, o::Vector{Float64}, t::Float64)
-    if isapprox((p - s.center)' * (p - s.center) - s.radius^2, 0.0; atol = 0.1)
+    if isapprox((p - s.center)' * (p - s.center) - s.radius^2, 0.0; atol = 0.5)
         normal = (p - s.center)/s.radius
         backfacing = norm(s.center - o) < norm(p - o)
         return Hit(t, p, normal, backfacing, s)
@@ -52,24 +52,16 @@ function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHi
         Lᵢ, l̂ = _radiance(light, hit)
 
         color += shape.material.difuse * Lᵢ * n̂'l̂
-        if color[1] < 0.0 || color[2] < 0.0 || color[3] < 0.0
-            # @show  l̂
-            # @show n̂'l̂
-            # @show Lᵢ
-            # @show color
-            # error()
-            color = RGB{Float64}(abs(color[1]), abs(color[2]), abs(color[3]) )
-        end
-        if color[1] > 255.0 || color[2] > 255.0 || color[3] > 255.0
-            # @show  l̂
-            # @show n̂'l̂
-            # @show Lᵢ
-            # @show color
-            # error()
-            # color = RGB{Float64}(abs(color[1]), abs(color[2]), abs(color[3]) )
-        end
+        
+        color = RGB{Float64}(abs(color[1]), abs(color[2]), abs(color[3]) )
+        
         # specular missing
     end
+    # color = color/255.0
+    # if color[1] > 1.0 color[1] = 1.0 end
+    # if color[2] > 1.0 color[1] = 1.0 end
+    # if color[2] > 1.0 color[1] = 1.0 end
+
     @show color
     # sleep(1.0)
     return color

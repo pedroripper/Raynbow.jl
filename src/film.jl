@@ -19,8 +19,8 @@ function _get_sample(f::AbstractFilm, i::Int, j::Int)
     return (i+0.5)/f.width, (j+0.5)/f.height
 end
 
-function _save(f::AbstractFilm, filename::String = "img.pdf")
-    ImageMagick.save(filename, f.img)
+function _save(f::AbstractFilm, filename::String = "img.ppm")
+    ImageMagick.save(filename, ImageMagick.map(clamp01nan, f.img))
     return
 end
 
