@@ -7,5 +7,5 @@
 
 # Examples
 
-![Red Sphere](docs/src/assets/img.ppm)
+![Red Sphere](docs/src/assets/img.png)
 
