@@ -21,6 +21,7 @@ end
 
 function _save(f::AbstractFilm, filename::String = "img.ppm")
     ImageMagick.save(filename, ImageMagick.map(clamp01nan, f.img))
+    # ImageMagi/ck.save(filename, f.img)
     return
 end
 

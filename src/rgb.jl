@@ -1,7 +1,7 @@
 import Base.+, Base.zeros, Base.getindex
 
 function zeros(::Type{RGB{Float64}}, n::Int, m::Int)
-    return [RGB{Float64}(0.0,0.0,0.0) for i in 1:n, j in 1:m]
+    return [RGB{Float64}(0.0) for i in 1:n, j in 1:m]
 end
 
 function getindex(c::RGB{Float64}, i::Int)
