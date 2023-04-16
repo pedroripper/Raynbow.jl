@@ -33,6 +33,20 @@ mutable struct PointLight <: AbstractLight
     end
 end
 
+mutable struct RectangularLight <: AbstractLight
+    center::Vector{Float64}
+    power::Float64
+    eᵢ::Vector{Float64}
+    eⱼ::Vector{Float64}
+    n̂::Vector{Float64}
+    Area::Float64
+    samples::Int
+    function RectangularLight(center::Vector{Float64}, power::Float64,eᵢ::Vector{Float64},eⱼ::Vector{Float64}, samples::Int = 100)
+        n̂ = normalize(cross(eᵢ,eⱼ))
+        Area = norm(cross(eᵢ,eⱼ))
+        new(center, power, eᵢ, eⱼ, n̂, Area,samples)
+    end
+end
 
 function _get_hit(s::Sphere, ray::Ray, ε::Float64 = 0.1)
     a = dot(ray.direction,ray.direction)
@@ -88,6 +102,18 @@ function _get_hit(l::PointLight, ray::Ray)
     return nothing
 end
 
+function _get_light_sample(light::RectangularLight, quadrant::Int)
+    if quadrant == 1
+        return light.center + rand()*(light.eᵢ/2.0) +  rand()*(light.eⱼ/2.0)
+    elseif quadrant == 2
+        return light.center + rand()*light.eᵢ +  rand()*(light.eⱼ/2.0)
+    elseif quadrant == 3
+        return light.center + rand()*(light.eᵢ/2.0) +  rand()*light.eⱼ
+    else
+        return light.center + rand()*light.eᵢ +  rand()*light.eⱼ
+    end
+end
+
 function _radiance(light::PointLight, hit::AbstractHit)
     
     l̂ = normalize(light.center - hit.position)
@@ -113,6 +139,18 @@ function _radiance(scene::AbstractScene,light::PointLight, hit::AbstractHit)
     return 0.0, [0.0,0.0,0.0]
 end
 
+function _sample_radiance(scene::AbstractScene, light::RectangularLight, hit::AbstractHit, sample_i::Int)
+    s = _get_light_sample(light,(sample_i%4)+1)
+    l̂ = normalize(s - hit.position)
+    r = norm(s - hit.position)
+    ray = Ray(hit.position, -l̂)
+    hit_l = _intersect(ray,scene)
+    if isnothing(hit_l) || hit_l.t > r
+        Lᵢ = ((light.power*dot(-l̂,light.n̂))/(r^2))*(light.Area/light.samples)
+        return Lᵢ,  l̂
+    end
+    return 0.0, [0.0,0.0,0.0]
+end
 
 function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHit, origin::Vector{Float64})
     color = shape.material.ambient
@@ -123,14 +161,26 @@ function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHi
 
     for light in scene.lights
 
-        Lᵢ, l̂ = _radiance(scene,light, hit)
-    
-        color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,-l̂))
+        if typeof(light) == RectangularLight
+            for i in 1:light.samples
+                Lᵢ, l̂ = _sample_radiance(scene, light, hit, i)
+            
+                color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,-l̂))
 
-        r̂ = 2*(dot(n̂,-l̂))*n̂ - (-l̂)
+                r̂ = 2*(dot(n̂,-l̂))*n̂ - (-l̂)
 
-        color += shape.material.specular * max(0.0, dot(r̂,v̂))^100
-        
+                color += shape.material.specular * max(0.0, dot(r̂,v̂))^100
+            end
+        else
+            Lᵢ, l̂ = _radiance(scene,light, hit)
+            
+            color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,-l̂))
+
+            r̂ = 2*(dot(n̂,-l̂))*n̂ - (-l̂)
+
+            color += shape.material.specular * max(0.0, dot(r̂,v̂))^100
+        end
+
     end
 
     return color
