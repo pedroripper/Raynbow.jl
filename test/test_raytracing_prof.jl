@@ -1,29 +1,26 @@
 function test_intersect()
     f = Raynbow.Film(
-        200,400,200,400
+        1000,1000,1000,1000
     )
     c = Raynbow.Camera(
+        [8.0,0.0,0.0],
         [0.0,0.0,0.0],
-        [10.0,0.0,0.0],
         [0.0,1.0,0.0],
         f,
-        5.0,
-        50
+        51.0
     )
     l = Raynbow.PointLight(
-        [20.0,15.0,0.0],
-        1.0
+        [0.0,3.0,0.0],
+        20.0
     )
-    # l2 = Raynbow.PointLight(
-    #     [50.0,15.0,15.0],
-    #     1.0
-    # )
-    sphere = Raynbow.Sphere([30.0,5.0,0.0], 5.0, Raynbow.Plastic())
-    ground = Raynbow.Ground([0.0,1.0,0.0],[0.0,0.0,0.0],Raynbow.Plastic(RGB(0.0,50.0,0.0)))
+    sphere = Raynbow.Sphere([0.0,0.0,-1.0], 0.5, Raynbow.Plastic())
+    sphere2 = Raynbow.Sphere([0.0,0.0,1.0], 0.5, Raynbow.Plastic([0.0,0.0,0.1]))
+    ground = Raynbow.Ground([0.0,1.0,0.0],[0.0,-1.0,0.0],Raynbow.Plastic([0.0,0.4,0.0]))
 
-    # sphere2 = Raynbow.Sphere([20.0,0.0,5.0], 5.0, Raynbow.Plastic(RGB(0.0,0.0,255.0)))
-    scene = Raynbow.Scene([sphere,ground],[l])
+    # sphere = Raynbow.Sphere([0.0,0.0,0.0], 1.0, Raynbow.Plastic())
+    # ground = Raynbow.Ground([0.0,1.0,0.0],[0.0,-1.0,0.0],Raynbow.Plastic([0.0,0.4,0.0]))
 
+    scene = Raynbow.Scene([sphere,sphere2,ground],[l])
 
     Raynbow.render(c, scene)
     Raynbow._save(f)

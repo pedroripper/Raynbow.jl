@@ -10,13 +10,14 @@ mutable struct Film <: AbstractFilm
     end
 end
 
-function _set_pixel(f::AbstractFilm, i::Int, j::Int, c::RGB{Float64})
-    f.img[i,j] = c
+function _set_pixel(f::AbstractFilm, i::Int, j::Int, c::Vector{Float64})
+    color = RGB(c[1],c[2],c[3])
+    f.img[j,i] = color
     return
 end
 
 function _get_sample(f::AbstractFilm, i::Int, j::Int)
-    return (i+0.5)/f.width, (j+0.5)/f.height
+    return (i-0.5)/f.width, (j-0.5)/f.height
 end
 
 function _save(f::AbstractFilm, filename::String = "img.ppm")
