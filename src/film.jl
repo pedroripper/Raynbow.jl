@@ -17,7 +17,7 @@ function _set_pixel(f::AbstractFilm, i::Int, j::Int, c::Vector{Float64})
 end
 
 function _get_sample(f::AbstractFilm, i::Int, j::Int)
-    return (i-0.5)/f.width, (j-0.5)/f.height
+    return (i-rand())/f.width, (j-rand())/f.height
 end
 
 function _save(f::AbstractFilm, filename::String = "img.ppm")
