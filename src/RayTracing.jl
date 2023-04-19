@@ -23,15 +23,19 @@ function _trace_ray(scene::Scene, ray::Ray)
     hit = _intersect(ray, scene)
 
     if isnothing(hit)
-        # return scene.ambient_color
-        return [0.6,0.6,0.6]
+        return scene.ambient_color
     end
     
     if _islight(hit)
         r = hit.t
+        @show [hit.element.power/(r^2), hit.element.power/(r^2), hit.element.power/(r^2)]
         color = scene.ambient_color + [hit.element.power/(r^2), hit.element.power/(r^2), hit.element.power/(r^2)]
     else
-        color = _eval_color(hit.element, scene, hit, ray.origin)
+        if typeof(hit.element.material) == Metal
+            color = _eval_color_metal(hit.element, scene, hit, ray.origin)
+        else
+            color = _eval_color(hit.element, scene, hit, ray.origin)
+        end
     end
     return  color
 end
