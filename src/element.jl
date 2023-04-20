@@ -1,220 +1,8 @@
-struct Plastic <: Material 
-    difuse::Vector{Float64}
-    specular::Vector{Float64}
-    ambient::Vector{Float64}
-    function Plastic(difuse::Vector{Float64} = [1.0,0.0,0.0], specular::Vector{Float64} = [0.5,0.5,0.5], ambient::Vector{Float64} = [0.0,0.0,0.0])
-        new(difuse, specular,ambient)
-    end
-end
-
-struct Metal <: Material 
-    difuse::Vector{Float64}
-    specular::Vector{Float64}
-    ambient::Vector{Float64}
-    reflectance::Float64
-    function Metal(difuse::Vector{Float64} = [1.0,0.0,0.0], specular::Vector{Float64} = [0.5,0.5,0.5], ambient::Vector{Float64} = [0.0,0.0,0.0]; reflectance::Float64 = 0.3)
-        new(difuse, specular,ambient,reflectance)
-    end
-end
-
-struct Sphere <: AbstractShape
-    center::Vector{Float64}
-    radius::Float64
-    material::Material
-    function Sphere(center::Vector{Float64}, r::Float64, material::Material)
-        new(center, r, material)
-    end
-end
-
-struct Box <: AbstractShape
-    b_min::Vector{Float64}
-    b_max::Vector{Float64}
-    material::Material
-    function Box(b_min::Vector{Float64}, b_max::Vector{Float64}, material::Material)
-        new(b_min, b_max, material)
-    end
-end
-
-mutable struct Ground <:AbstractShape
-    normal::Vector{Float64}
-    center::Vector{Float64}
-    material::Material
-    function Ground(normal::Vector{Float64} = [0.0,1.0,0.0], center::Vector{Float64} = [0.0,0.0,0.0], material::Material = Plastic([0.2,0.2,0.2]))
-        new(normal, center, material)
-    end
-end
-
-mutable struct PointLight <: AbstractLight
-    center::Vector{Float64}
-    power::Float64
-    function PointLight(center::Vector{Float64}, power::Float64)
-        new(center, power)
-    end
-end
-
-mutable struct RectangularLight <: AbstractLight
-    center::Vector{Float64}
-    power::Float64
-    eᵢ::Vector{Float64}
-    eⱼ::Vector{Float64}
-    n̂::Vector{Float64}
-    Area::Float64
-    samples::Int
-    function RectangularLight(center::Vector{Float64}, power::Float64,eᵢ::Vector{Float64},eⱼ::Vector{Float64}, samples::Int = 100)
-        n̂ = normalize(cross(eᵢ,eⱼ))
-        Area = norm(cross(eᵢ,eⱼ))
-        new(center, power, eᵢ, eⱼ, n̂, Area,samples)
-    end
-end
-
-function _get_hit(s::Sphere, ray::Ray, ε::Float64 = 0.1)
-    a = dot(ray.direction,ray.direction)
-    origin_center = (ray.origin - s.center)
-
-    b = dot(2.0*ray.direction,origin_center)
-    c = dot(origin_center,origin_center) - s.radius^2
-
-    Δ = b^2 - 4*a*c
-
-    t = nothing
-
-    if Δ ≈ 0.0
-        t = -b/2*a
-    elseif Δ > 0.0
-        t1 = (-b + sqrt(Δ))/(2*a)
-        t2 = (-b - sqrt(Δ))/(2*a)
-        if t1 ≥ 0.0 && t2 ≥ 0.0
-            t = min(t1,t2)
-        elseif t1 ≥ 0.0
-            t = t1
-        else
-            t = t2
-        end
-    end
-
-    if !isnothing(t)  && t > ε
-
-        hit_point = _evaluate(ray,t)
-
-        return Hit(t, hit_point,normalize(hit_point-s.center), t < 0.0, s)
-    end
-
-    return nothing
-end
-
-function _get_normal(b::Box, point::Vector{Float64})
-    normal = [0.0, 0.0, 0.0]
-    eps = 1e-6
-    
-    if abs(point[1] - b.b_min[1]) < eps
-        normal = [-1.0, 0.0, 0.0]
-    elseif abs(point[1] - b.b_max[1]) < eps
-        normal = [1.0, 0.0, 0.0]
-    elseif abs(point[2] - b.b_min[2]) < eps
-        normal = [0.0, -1.0, 0.0]
-    elseif abs(point[2] - b.b_max[2]) < eps
-        normal = [0.0, 1.0, 0.0]
-    elseif abs(point[3] - b.b_min[3]) < eps
-        normal = -[0.0, 0.0, -1.0]   ###
-    elseif abs(point[3] - b.b_max[3]) < eps
-        normal = [0.0, 0.0, 1.0]  
-    end
-    
-    return normal
-end
-
-function _get_hit(b::Box, ray::Ray)
-    t₀ = (b.b_min - ray.origin)./ray.direction
-    t₁ = (b.b_max - ray.origin)./ray.direction
-
-    t_near = [min(t₀[i],t₁[i]) for i in 1:3]
-    t_far =  [max(t₀[i],t₁[i]) for i in 1:3]
-
-    t_min = t_near[argmax(t_near)]
-    t_max = t_far[argmin(t_far)]
-
-    if t_min < 0
-        t_min = t_max
-        if t_min < 0
-            return nothing
-        end
-    end
-
-    hit_point = _evaluate(ray,t_min)
-    hit_normal = _get_normal(b, hit_point)
-    backfacing = dot(-hit_normal, ray.direction) > 0.0
-    hit = Hit(t_min, hit_point, hit_normal, backfacing, b)
-    return hit
-end
-
-function _get_hit(g::Ground, ray::Ray)
-
-    t = dot(ray.origin - g.center, g.normal)/(ray.direction'g.normal)
-    hit_point = _evaluate(ray,t)
-    if t < 0.0 
-        return nothing
-    end
-    return Hit(t, hit_point, g.normal , t < 0.0, g)
-end
-
-function _get_hit(l::PointLight, ray::Ray)
-    if normalize(l.center-ray.origin) == ray.direction
-        t = norm(l.center-ray.origin)
-        hit_point = _evaluate(ray,t)
-        return Hit(t, hit_point, [0.0,0.0,0.0] , t < 0.0, l)
-    end
-    return nothing
-end
-
-function _get_light_sample(light::RectangularLight, quadrant::Int)
-    if quadrant == 1
-        return light.center + rand()*(light.eᵢ/2.0) +  rand()*(light.eⱼ/2.0)
-    elseif quadrant == 2
-        return light.center + rand()*light.eᵢ +  rand()*(light.eⱼ/2.0)
-    elseif quadrant == 3
-        return light.center + rand()*(light.eᵢ/2.0) +  rand()*light.eⱼ
-    else
-        return light.center + rand()*light.eᵢ +  rand()*light.eⱼ
-    end
-end
-
-function _radiance(light::PointLight, hit::AbstractHit)
-    
-    l̂ = normalize(light.center - hit.position)
-    r = norm(light.center - hit.position)
-
-    Lᵢ = light.power/(r^2)
-    return Lᵢ, l̂
-end
-
-
-function _radiance(scene::AbstractScene,light::PointLight, hit::AbstractHit)
-    
-    l̂ = normalize(light.center - hit.position)
-    r = norm(light.center - hit.position)
-    
-    ray = Ray(hit.position, -l̂)
-    hit_l = _intersect(ray,scene)
-
-    if isnothing(hit_l) || hit_l.t > r
-        Lᵢ = light.power/(r^2)
-        return Lᵢ,  l̂
-    end
-    return 0.0, [0.0,0.0,0.0]
-end
-
-function _sample_radiance(scene::AbstractScene, light::RectangularLight, hit::AbstractHit, sample_i::Int)
-    s = _get_light_sample(light,(sample_i%4)+1)
-    l̂ = normalize(s - hit.position)
-    r = norm(s - hit.position)
-    ray = Ray(hit.position, -l̂)
-    hit_l = _intersect(ray,scene)
-    if isnothing(hit_l) || hit_l.t > r
-        Lᵢ = ((light.power*dot(-l̂,light.n̂))/(r^2))*(light.Area/light.samples)
-        return Lᵢ,  l̂
-    end
-    return 0.0, [0.0,0.0,0.0]
-end
+include("material.jl")
+include("sphere.jl")
+include("light.jl")
+include("ground.jl")
+include("box.jl")
 
 function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHit, origin::Vector{Float64})
     color = shape.material.ambient
@@ -223,17 +11,13 @@ function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHi
     v̂ = normalize(origin - hit.position)
     n̂ = hit.normal
 
-    if hit.backfacing
-        return [0.0,0.0,0.0]
-    end
-
     for light in scene.lights
 
         if typeof(light) == RectangularLight
             for i in 1:light.samples
                 Lᵢ, l̂ = _sample_radiance(scene, light, hit, i)
             
-                color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,-l̂))
+                color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,l̂))
 
                 r̂ = 2*(dot(n̂,-l̂))*n̂ - (-l̂)
 
@@ -242,7 +26,7 @@ function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHi
         else
             Lᵢ, l̂ = _radiance(scene,light, hit)
             
-            color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,-l̂))
+            color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,l̂))
 
             r̂ = 2*(dot(n̂,-l̂))*n̂ - (-l̂)
 
@@ -267,7 +51,7 @@ function _eval_color_metal(shape::AbstractShape, scene::AbstractScene, hit::Abst
 
     r̂ = normalize(2*(dot(n̂,-v̂))*n̂ - (-v̂))
 
-    ray = Ray(p, -r̂)
+    ray = Ray(p, hit.backfacing ? -r̂ : r̂)
 
     color += R * _trace_ray(scene, ray)
 
