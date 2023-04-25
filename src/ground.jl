@@ -7,7 +7,7 @@ mutable struct Ground <:AbstractShape
     end
 end
 
-function _get_hit(g::Ground, ray::Ray, ε::Float64 = 1e-10)
+function _get_hit(g::Ground, ray::Ray, ε::Float64 = 0.05)
 
     t = dot(ray.origin - g.center, g.normal)/dot(ray.direction,g.normal)
     hit_point = _evaluate(ray,t)
