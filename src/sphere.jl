@@ -28,7 +28,7 @@ function _get_hit(s::Sphere, ray::Ray, ε::Float64 = 0.01)
             t = min(t1,t2)
         elseif t1 ≥ 0.0
             t = t1
-        else
+        elseif t2 ≥ 0.0
             t = t2
         end
     end

@@ -21,15 +21,6 @@ mutable struct RectangularLight <: AbstractLight
     end
 end
 
-function _get_hit(l::PointLight, ray::Ray)
-    if normalize(l.center-ray.origin) == ray.direction
-        t = norm(l.center-ray.origin)
-        hit_point = _evaluate(ray,t)
-        return Hit(t, hit_point, [0.0,0.0,0.0] , t < 0.0, l)
-    end
-    return nothing
-end
-
 function _get_light_sample(light::RectangularLight, quadrant::Int)
     if quadrant == 1
         return light.center + rand()*(light.eᵢ/2.0) +  rand()*(light.eⱼ/2.0)
@@ -59,8 +50,8 @@ function _radiance(scene::AbstractScene,light::PointLight, hit::AbstractHit)
     
     ray = Ray(hit.position, -l̂)
     hit_l = _intersect(ray,scene)
-
-    if isnothing(hit_l) || hit_l.t > r
+    
+    if isnothing(hit_l) || hit_l.t > r        
         Lᵢ = light.power/(r^2)
         return Lᵢ,  l̂
     end

@@ -7,13 +7,16 @@ mutable struct Ground <:AbstractShape
     end
 end
 
-function _get_hit(g::Ground, ray::Ray)
+function _get_hit(g::Ground, ray::Ray, ε::Float64 = 1e-10)
 
-    t = dot(ray.origin - g.center, g.normal)/(ray.direction'g.normal)
+    t = dot(ray.origin - g.center, g.normal)/dot(ray.direction,g.normal)
     hit_point = _evaluate(ray,t)
-    if t < 0.0 
-        return nothing
-    end
+    n̂ = normalize(g.normal)
+    backfacing = dot(ray.direction, n̂) < 0.0
+    n̂ = backfacing ? -n̂ : n̂
     
-    return Hit(t, hit_point, g.normal , t < 0.0, g)
+    if t > ε && dot(ray.direction,g.normal) > ε
+        return Hit(t, hit_point, n̂, backfacing, g)
+    end
+    return nothing
 end

@@ -45,7 +45,7 @@ function _eval_color_metal(shape::AbstractShape, scene::AbstractScene, hit::Abst
 
     R₀ = shape.material.reflectance
 
-    R = R₀ + (1.0-R₀)*(1.0 - dot(v̂,n̂))^5
+    R = R₀ + (1.0-R₀)*(1.0 - dot(-v̂,n̂))^5
 
     color = (1.0 - R)*_eval_color(shape, scene, hit, origin)
 
