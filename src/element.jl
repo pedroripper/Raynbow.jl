@@ -1,7 +1,7 @@
 include("material.jl")
 include("sphere.jl")
 include("light.jl")
-include("ground.jl")
+include("plane.jl")
 include("box.jl")
 
 function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHit, origin::Vector{Float64})

@@ -19,10 +19,10 @@ function test_intersect()
     #     1.0
     # )
     sphere = Raynbow.Sphere([30.0,0.0,-5.0], 5.0, Raynbow.Plastic())
-    ground = Raynbow.Ground([0.0,0.0,1.0],[0.0,0.0,5.0],Raynbow.Plastic(RGB(0.0,100.0,0.0)))
+    plane = Raynbow.Plane([0.0,0.0,1.0],[0.0,0.0,5.0],Raynbow.Plastic(RGB(0.0,100.0,0.0)))
 
     # sphere2 = Raynbow.Sphere([20.0,0.0,5.0], 5.0, Raynbow.Plastic(RGB(0.0,0.0,255.0)))
-    scene = Raynbow.Scene([sphere,ground],[l])
+    scene = Raynbow.Scene([sphere,plane],[l])
 
 
     Raynbow.render(c, scene)

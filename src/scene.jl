@@ -23,4 +23,18 @@ mutable struct Scene <: AbstractScene
         )
             new(s,l,ambient_color)
     end
+    function Scene(
+        s::Vector{Box}, 
+        l::Vector{PointLight},
+        ambient_color::Vector{Float64} = [0.1,0.1,0.1]
+        )
+            new(s,l,ambient_color)
+    end
+    function Scene(
+        s::Vector{Plane}, 
+        l::Vector{PointLight},
+        ambient_color::Vector{Float64} = [0.1,0.1,0.1]
+        )
+            new(s,l,ambient_color)
+    end
 end

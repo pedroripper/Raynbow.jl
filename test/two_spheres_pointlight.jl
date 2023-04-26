@@ -29,12 +29,12 @@ function test_intersect()
     
     # sphere4 = Raynbow.Sphere([0.0,2.0,1.0], 0.5, Raynbow.Plastic([0.5,0.0,0.5]))
     
-    # ground = Raynbow.Ground([0.0,1.0,0.0],[0.0,1.0,0.0],Raynbow.Plastic([0.0,0.4,0.0]))
+    # plane = Raynbow.Plane([0.0,1.0,0.0],[0.0,1.0,0.0],Raynbow.Plastic([0.0,0.4,0.0]))
 
     # sphere = Raynbow.Sphere([0.0,0.0,0.0], 1.0, Raynbow.Plastic())
-    ground = Raynbow.Ground([0.0,1.0,0.0],[0.0,-0.5,0.0],Raynbow.Plastic([0.0,0.4,0.0]))
+    plane = Raynbow.Plane([0.0,1.0,0.0],[0.0,-0.5,0.0],Raynbow.Plastic([0.0,0.4,0.0]))
 
-    scene = Raynbow.Scene([sphere, ground],[l,l2,l3])
+    scene = Raynbow.Scene([sphere, plane],[l,l2,l3])
 
     Raynbow.render(c, scene)
     Raynbow._save(f)

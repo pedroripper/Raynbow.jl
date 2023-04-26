@@ -1,13 +1,13 @@
-mutable struct Ground <:AbstractShape
+mutable struct Plane <:AbstractShape
     normal::Vector{Float64}
     center::Vector{Float64}
     material::Material
-    function Ground(normal::Vector{Float64} = [0.0,1.0,0.0], center::Vector{Float64} = [0.0,0.0,0.0], material::Material = Plastic([0.2,0.2,0.2]))
+    function Plane(normal::Vector{Float64} = [0.0,1.0,0.0], center::Vector{Float64} = [0.0,0.0,0.0], material::Material = Plastic([0.2,0.2,0.2]))
         new(normal, center, material)
     end
 end
 
-function _get_hit(g::Ground, ray::Ray, ε::Float64 = 0.05)
+function _get_hit(g::Plane, ray::Ray, ε::Float64 = 0.05)
 
     t = dot(ray.origin - g.center, g.normal)/dot(ray.direction,g.normal)
     hit_point = _evaluate(ray,t)
