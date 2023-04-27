@@ -20,7 +20,7 @@ include("camera.jl")
 include("element/element.jl")
 include("hit.jl")
 include("scene.jl")
-include("RayTracing.jl")
+include("raytracing.jl")
 
 
 end # module Raynbow

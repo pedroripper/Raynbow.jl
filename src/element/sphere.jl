@@ -1,4 +1,4 @@
-struct Sphere <: AbstractShape
+mutable struct Sphere <: AbstractShape
     center::Vector{Float64}
     radius::Float64
     material::Material

@@ -46,11 +46,8 @@ end
 function render(camera::Camera, scene::Scene, pixel_samples::Int = 1)
     n_pixel = 0
     painted =  0
-    for i in 1:camera.film.n_pixels_x
-        for j in 1:camera.film.n_pixels_y
-            # print("\e[1G")
-            # print("\e[2K")
-            # print(" Pixel $(n_pixel) || Painted $(painted)")
+    for i in 1:camera.film.width
+        for j in 1:camera.film.height
             color = [0.0,0.0,0.0]
             for k in 1:pixel_samples
                 x,y = _get_sample(camera.film, i, j)

@@ -1,5 +1,5 @@
 f = Raynbow.Film(
-    1000,1000,1000,1000
+    1000,1000,
 )
 c = Raynbow.Camera(
     [8.0,0.0,0.0],
@@ -9,10 +9,10 @@ c = Raynbow.Camera(
     51.
 )
 l = Raynbow.RectangularLight(
-    [1.0,3.0,-1.0],
-    30.0,
-    [1.0,3.0,1.0],
-    [3.0,5.0,-1.0]
+    [0.0,6.0,-1.0],
+    40.0,
+    [1.0,6.0,-1.0],
+    [1.0,6.0,1.0]
 )
 
 sphere = Raynbow.Sphere([0.8,-1.0,-1.5], 0.5, Raynbow.Plastic())

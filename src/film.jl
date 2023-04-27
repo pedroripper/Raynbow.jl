@@ -1,12 +1,10 @@
 mutable struct Film <: AbstractFilm
     width::Int
     height::Int
-    n_pixels_x::Int # number of pixels 
-    n_pixels_y::Int # number of pixels
     img::Matrix{RGB{Float64}}
-    function Film(width::Int,height::Int, n_pixels_x::Int, n_pixels_y::Int)
-        img = zeros(RGB{Float64}, n_pixels_x, n_pixels_y)
-        new(width,height, n_pixels_x, n_pixels_y, img)
+    function Film(width::Int,height::Int)
+        img = zeros(RGB{Float64}, width, height)
+        new(width,height, img)
     end
 end
 
