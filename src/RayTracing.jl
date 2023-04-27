@@ -12,6 +12,9 @@ function _intersect(r::Ray, scene::Scene)
 end
 
 function _intersect(r::Ray, light::AbstractLight)
+    if typeof(light) == PointLight
+        return nothing
+    end
     h = _get_hit(light, r)
     if !isnothing(h)
         return h

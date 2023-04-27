@@ -20,7 +20,7 @@ function _get_sample(f::AbstractFilm, i::Int, j::Int)
     return (i-rand())/f.width, (j-rand())/f.height
 end
 
-function _save(f::AbstractFilm, filename::String = "img.ppm")
+function _save(f::AbstractFilm, filename::String = "img.png")
     ImageMagick.save(filename, ImageMagick.map(clamp01nan, f.img))
     # ImageMagi/ck.save(filename, f.img)
     return

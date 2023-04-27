@@ -9,13 +9,14 @@ c = Raynbow.Camera(
     51.
 )
 l = Raynbow.PointLight(
-    [0.0,3.0,0.0],
+    [5.,3.0,0.0],
     10.0)
 
-box   = Raynbow.Box([-1.0,0.0,-1.0],[1.0,1.0,1.0],Raynbow.Plastic([0.0,0.0,0.4]))
+sphere = Raynbow.Sphere([5.0,-0.5,0.], 0.5, Raynbow.Plastic())
+
 plane = Raynbow.Plane([0.0,1.0,0.0],[0.0,-0.5,0.0],Raynbow.Plastic([0.0,0.4,0.0]))
 
-scene = Raynbow.Scene([box,plane],[l],[0.67, 0.84, 0.9])
+scene = Raynbow.Scene([sphere,plane],[l],[0.67, 0.84, 0.9])
 
 Raynbow.render(c, scene)
 Raynbow._save(f)

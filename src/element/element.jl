@@ -2,7 +2,7 @@ include("material.jl")
 include("sphere.jl")
 include("light.jl")
 include("plane.jl")
-include("box.jl")
+
 
 function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHit, origin::Vector{Float64})
     color = shape.material.ambient

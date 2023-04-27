@@ -21,8 +21,21 @@ mutable struct RectangularLight <: AbstractLight
     end
 end
 
+function _get_hit(l::RectangularLight, ray::Ray, ε::Float64 = 0.05)
+    t = dot(l.center - ray.origin, l.n̂)/dot(ray.direction,l.n̂)
+    hit_point = _evaluate(ray,t)
+    backfacing = dot(ray.direction, l.n̂) < 0.0
+    
+    if t > ε && dot(ray.direction,l.n̂) > ε
+        return Hit(t, hit_point, l.n̂, backfacing, l)
+    end
+    return nothing
+end
+
 function _get_light_sample(light::RectangularLight, quadrant::Int)
-    if quadrant == 1
+    if quadrant == 0
+        return light.center + rand()*(light.eᵢ) +  rand()*(light.eⱼ)
+    elseif quadrant == 1
         return light.center + rand()*(light.eᵢ/2.0) +  rand()*(light.eⱼ/2.0)
     elseif quadrant == 2
         return light.center + rand()*light.eᵢ +  rand()*(light.eⱼ/2.0)
