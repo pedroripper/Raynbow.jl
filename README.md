@@ -5,6 +5,8 @@
     <img src="/docs/src/assets/logo.svg" width=400px alt="Raynbow.jl" />
 </div>
 
+Raynbow is a simple ray tracing package.
+
 # Examples
 
 ![Red sphere](examples/simple_sphere/simple_sphere_10.png)
