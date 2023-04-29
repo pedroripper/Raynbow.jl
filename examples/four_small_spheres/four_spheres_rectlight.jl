@@ -13,7 +13,8 @@ l = Raynbow.RectangularLight(
     40.0,
     [1.0,5.0,-1.0],
     [1.0,5.0,1.0],
-    100
+    100,
+    Raynbow.UNIFORM
 )
 
 sphere = Raynbow.Sphere([0.0,0.0,-1.0], 0.5, Raynbow.Plastic())

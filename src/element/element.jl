@@ -8,7 +8,7 @@ function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHi
     color = shape.material.ambient
 
     for light in scene.lights
-        _radiance(scene, light, hit, origin, color)
+        color += _radiance(scene, light, hit, origin)
     end
 
     return color

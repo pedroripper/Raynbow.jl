@@ -1,6 +1,6 @@
 @enum SamplingMethod begin
-    StratifiedSampling
-    UniformSampling
+    STRATIFIED
+    UNIFORM
 end
 
 mutable struct PointLight <: AbstractLight
@@ -20,7 +20,7 @@ mutable struct RectangularLight <: AbstractLight
     Area::Float64
     samples::Int
     sampling_method::SamplingMethod
-    function RectangularLight(center::Vector{Float64}, power::Float64,eᵢ::Vector{Float64},eⱼ::Vector{Float64}, samples::Int = 100, method::SamplingMethod =  SamplingMethod.StratifiedSampling)
+    function RectangularLight(center::Vector{Float64}, power::Float64,eᵢ::Vector{Float64},eⱼ::Vector{Float64}, samples::Int = 100, method::SamplingMethod = STRATIFIED)
         n̂ = normalize(cross(eᵢ,eⱼ))
         Area = norm(cross(eᵢ,eⱼ))
         new(center, power, eᵢ, eⱼ, n̂, Area,samples,method)
@@ -53,7 +53,7 @@ function _get_light_sample(light::RectangularLight, quadrant::Int)
 end
 
 function _sample_radiance(scene::AbstractScene, light::RectangularLight, hit::AbstractHit, sample_i::Int)
-    if light.sampling_method == SamplingMethod.UniformSampling
+    if light.sampling_method == UNIFORM
         s = _get_light_sample(light,0)
     else
         s = _get_light_sample(light,(sample_i%4)+1)
@@ -71,7 +71,8 @@ function _sample_radiance(scene::AbstractScene, light::RectangularLight, hit::Ab
     return 0.0, [0.0,0.0,0.0]
 end
 
-function _radiance(scene::AbstractScene, light::RectangularLight, hit::AbstractHit, origin::Vector{Float64}, color::Vector{Float64})
+function _radiance(scene::AbstractScene, light::RectangularLight, hit::AbstractHit, origin::Vector{Float64})
+    color = [0.0,0.0,0.0]
     v̂ = normalize(origin - hit.position)
     n̂ = hit.normal
     for i in 1:light.samples
@@ -80,10 +81,11 @@ function _radiance(scene::AbstractScene, light::RectangularLight, hit::AbstractH
         r̂ = 2*(dot(n̂,-l̂))*n̂ - (-l̂)
         color += hit.element.material.specular * max(0.0, dot(r̂,v̂))^100
     end
-    return
+    return color
 end
 
-function _radiance(scene::AbstractScene,light::PointLight, hit::AbstractHit, origin::Vector{Float64}, color::Vector{Float64})
+function _radiance(scene::AbstractScene,light::PointLight, hit::AbstractHit, origin::Vector{Float64})
+    color = [0.0,0.0,0.0]
     v̂ = normalize(origin - hit.position)
     n̂ = hit.normal
 
@@ -92,7 +94,7 @@ function _radiance(scene::AbstractScene,light::PointLight, hit::AbstractHit, ori
     
     ray = Ray(hit.position, -l̂)
     hit_l = _intersect(ray,scene)
-    
+    # @show color
     if isnothing(hit_l) || hit_l.t > r        
         Lᵢ = light.power/(r^2)
         color += hit.element.material.difuse * Lᵢ * max(0.0,dot(n̂,l̂))
@@ -101,7 +103,7 @@ function _radiance(scene::AbstractScene,light::PointLight, hit::AbstractHit, ori
     else
         color += [0.0,0.0,0.0]
     end
-
-    return
+    # @show color
+    return color
 
 end
