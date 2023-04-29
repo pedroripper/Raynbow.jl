@@ -6,33 +6,9 @@ include("plane.jl")
 
 function _eval_color(shape::AbstractShape, scene::AbstractScene, hit::AbstractHit, origin::Vector{Float64})
     color = shape.material.ambient
-    
-
-    v̂ = normalize(origin - hit.position)
-    n̂ = hit.normal
 
     for light in scene.lights
-
-        if typeof(light) == RectangularLight
-            for i in 1:light.samples
-                Lᵢ, l̂ = _sample_radiance(scene, light, hit, i)
-            
-                color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,l̂))
-
-                r̂ = 2*(dot(n̂,-l̂))*n̂ - (-l̂)
-
-                color += shape.material.specular * max(0.0, dot(r̂,v̂))^100
-            end
-        else
-            Lᵢ, l̂ = _radiance(scene,light, hit)
-            
-            color += shape.material.difuse * Lᵢ * max(0.0,dot(n̂,l̂))
-
-            r̂ = 2*(dot(n̂,-l̂))*n̂ - (-l̂)
-
-            color += shape.material.specular * max(0.0, dot(r̂,v̂))^100
-        end
-
+        _radiance(scene, light, hit, origin, color)
     end
 
     return color
