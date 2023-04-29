@@ -9,8 +9,12 @@ Raynbow is a simple ray tracing package.
 
 # Examples
 
+|   |   |
+|---|---|
+| ![Image 1](examples/Four_spheres_metal/reflectance_point_0_1.png) | ![Image 2](examples/Four_spheres_metal/reflectance_point_0_5.png) |
+| ![Image 3](examples/Four_spheres_metal/reflectance_point_0_9.png) | ![Image 4](examples/Four_spheres_metal/reflectance_point_1_0.png) |
+
 ![Red sphere](examples/simple_sphere/simple_sphere_10.png)
 
-![Four spheres with rectangular light](examples/Four_spheres_metal/four_spheres_rect.png)
 
 ![Four spheres](examples/four_small_spheres/four_spheres_point.png)
