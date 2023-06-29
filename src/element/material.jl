@@ -26,7 +26,6 @@ struct Lambertian <: Material
     end
 end
 
-# Using Malleys's method
 function _get_sample(material::Material)
     ξ₁ = rand()
     ξ₂ = rand()

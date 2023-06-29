@@ -19,13 +19,7 @@ function _trace_path(scene::Scene, ray::Ray, max_depth::Int)
             end
         end
         material = hit.element.material
-        p = hit.position
-        n = hit.normal
         light = rand(scene.lights)
-        Le = _radiance(scene, light, hit, ray.origin, true)
-
-        L += (Le.*_get_brdf(material)).*β
-
         if typeof(material) == Metal
             p = hit.position
             n̂ = hit.normal
@@ -41,16 +35,24 @@ function _trace_path(scene::Scene, ray::Ray, max_depth::Int)
 
             ray = Ray(p, hit.backfacing ? -r̂ : r̂)
 
-            color += R * _trace_path(scene, ray, max_depth-1)
+            color += R * _trace_path(scene, ray, max_depth)
 
             return color
         end
+
+        p = hit.position
+        n = hit.normal
+
+        Le = _radiance(scene, light, hit, ray.origin, true)
+
+        L += (Le.*_get_brdf(material)).*β
+
         wih, θ, _= _get_sample(material)
         pdf = _get_pdf(material, θ)
         wi = _normal_to_global(n, wih)
 
-        β .*= _get_brdf(material) .* max(0.0,dot(n, wi)) ./ pdf
-        # @show β
+        β .*= _get_brdf(material) .* max(0.0,dot(-n, wi)) ./ pdf
+
         ray = Ray(p, wi)
     end
 
@@ -68,7 +70,8 @@ function pathtrace(camera::Camera, scene::Scene, max_depth::Int, pixel_samples::
                 x,y = _get_sample(camera.film, i, j)
 
                 ray = _generate_ray(camera, x, y)
-                color += _trace_path(scene, ray, max_depth)
+                d_m = rand(1:max_depth)
+                color += _trace_path(scene, ray, d_m)
             end
             if color != [0.0,0.0,0.0]
                 painted += 1
@@ -76,7 +79,7 @@ function pathtrace(camera::Camera, scene::Scene, max_depth::Int, pixel_samples::
             _set_pixel(camera.film, i, j, color/pixel_samples)
             n_pixel +=1
         end
-
+        
     end 
 
 end
