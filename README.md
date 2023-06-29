@@ -5,9 +5,10 @@
     <img src="/docs/src/assets/logo.svg" width=400px alt="Raynbow.jl" />
 </div>
 
-Raynbow is a simple ray tracing package.
+Raynbow is a simple ray tracing and path tracing package.
 
 # Examples
+## Ray Tracing
 
 |   |   |
 |---|---|
@@ -18,3 +19,7 @@ Raynbow is a simple ray tracing package.
 
 
 ![Four spheres](examples/four_small_spheres/four_spheres_point.png)
+
+
+## Path Tracing
+![Four spheres with pathtracing](examples/Four_spheres_metal/four_spheres_path.png)

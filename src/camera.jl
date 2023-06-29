@@ -59,7 +59,6 @@ function _generate_ray(c::AbstractCamera, nx::Float64, ny::Float64)
     p = [-Δu + 2 * Δu * nx, -Δv + 2*Δv*ny, -f, 1.0]
     o = c.view_matrix_inv*[0.0,0.0,0.0,1.0]
     t = c.view_matrix_inv*p
-    # @show o,  t, p
-    # error()
+
     return Ray(o[1:3], normalize(t[1:3]-o[1:3]))
 end

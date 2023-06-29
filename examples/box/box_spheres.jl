@@ -17,5 +17,5 @@ plane = Raynbow.Plane([0.0,1.0,0.0],[0.0,-0.5,0.0],Raynbow.Plastic([0.0,0.4,0.0]
 
 scene = Raynbow.Scene([box,plane],[l],[0.67, 0.84, 0.9])
 
-Raynbow.render(c, scene)
+Raynbow.raytrace(c, scene)
 Raynbow._save(f)

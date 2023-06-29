@@ -1,6 +1,6 @@
 function _intersect(r::Ray, scene::Scene)
     closest_hit = nothing
-    for shape in scene.shapes 
+    for shape in [scene.shapes; scene.lights]
         h = _get_hit(shape, r)
         if !isnothing(h) && isnothing(closest_hit)
             closest_hit = h
@@ -31,8 +31,8 @@ function _trace_ray(scene::Scene, ray::Ray)
     
     if _islight(hit)
         r = hit.t
-        @show [hit.element.power/(r^2), hit.element.power/(r^2), hit.element.power/(r^2)]
-        color = scene.ambient_color + [hit.element.power/(r^2), hit.element.power/(r^2), hit.element.power/(r^2)]
+        # color = scene.ambient_color + [hit.element.power/(r^2), hit.element.power/(r^2), hit.element.power/(r^2)]
+        color = [1.0,1.0,1.0]
     else
         if typeof(hit.element.material) == Metal
             color = _eval_color_metal(hit.element, scene, hit, ray.origin)
@@ -43,7 +43,7 @@ function _trace_ray(scene::Scene, ray::Ray)
     return  color
 end
 
-function render(camera::Camera, scene::Scene, pixel_samples::Int = 1)
+function raytrace(camera::Camera, scene::Scene, pixel_samples::Int = 1)
     n_pixel = 0
     painted =  0
     for i in 1:camera.film.width
